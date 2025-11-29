@@ -84,7 +84,6 @@ if __name__ == "__main__":
         print(f"   Ошибка: {e}")
     print()
 
-    # Случай 4: CRITICAL - a = 0
     print("4. Критическая ошибка (a=0, b=0, c=3):")
     try:
         result = solve_quadratic(0, 0, 3)
