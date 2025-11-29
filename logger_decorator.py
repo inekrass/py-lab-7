@@ -1,5 +1,6 @@
 import sys
 import functools
+import logging
 from datetime import datetime
 
 
@@ -9,8 +10,17 @@ def logger(func=None, *, handle=sys.stdout):
 
     Args:
         func: Декорируемая функция (None при параметризованном вызове)
-        handle: Поток вывода для логирования (по умолчанию sys.stdout)
+        handle: Поток вывода для логирования (по умолчанию sys.stdout) или объект logging.Logger
     """
+    def log_message(message):
+        """Универсальная функция для записи сообщений в лог"""
+        if isinstance(handle, logging.Logger):
+            message = message.rstrip('\n')
+            if message:
+                handle.info(message)
+        else:
+            handle.write(message)
+
     def decorator(f):
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
@@ -27,19 +37,19 @@ def logger(func=None, *, handle=sys.stdout):
                 all_args = ""
 
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            handle.write(f"[{timestamp}] INFO: Вызов функции {f.__name__}({all_args})\n")
+            log_message(f"[{timestamp}] INFO: Вызов функции {f.__name__}({all_args})\n")
 
             try:
                 result = f(*args, **kwargs)
 
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                handle.write(f"[{timestamp}] INFO: Функция {f.__name__} успешно завершена. Результат: {repr(result)}\n")
+                log_message(f"[{timestamp}] INFO: Функция {f.__name__} успешно завершена. Результат: {repr(result)}\n")
 
                 return result
 
             except Exception as e:
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                handle.write(f"[{timestamp}] ERROR: В функции {f.__name__} произошло исключение {type(e).__name__}: {str(e)}\n")
+                log_message(f"[{timestamp}] ERROR: В функции {f.__name__} произошло исключение {type(e).__name__}: {str(e)}\n")
 
                 raise
 

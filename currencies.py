@@ -1,9 +1,16 @@
 import requests
-import sys
+import logging
 from logger_decorator import logger
 
+file_logger = logging.getLogger("currency_file")
+file_logger.setLevel(logging.INFO)
 
-@logger(handle=sys.stdout)
+file_handler = logging.FileHandler("currencies.log", encoding="utf-8")
+file_handler.setLevel(logging.INFO)
+
+file_logger.addHandler(file_handler)
+
+@logger(handle=file_logger)
 def get_currencies(currency_codes: list, url="https://www.cbr-xml-daily.ru/daily_json.js") -> dict:
     """
     Получает курсы валют с API ЦБ РФ.
